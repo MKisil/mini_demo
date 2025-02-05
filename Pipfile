@@ -12,6 +12,7 @@ google-generativeai = "*"
 python-dotenv = "*"
 pydub = "*"
 ffmpeg = "*"
+ffprobe = "*"
 
 [dev-packages]
 
