@@ -61,7 +61,7 @@ def transcribe_audio(input_file):
         response = speech_client.recognize(config=config, audio=audio)
     else:
         bucket_name = "mini_demo"
-        bucket = storage_client.bucket(bucket_name)
+        bucket = storage_client.get_bucket(bucket_name)
 
         blob_name = os.path.basename(converted_audio_filepath)
         blob = bucket.blob(blob_name)
