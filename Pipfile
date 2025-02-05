@@ -11,6 +11,7 @@ google-cloud-speech = "*"
 google-generativeai = "*"
 python-dotenv = "*"
 pydub = "*"
+ffmpeg = "*"
 
 [dev-packages]
 
