@@ -7,5 +7,6 @@ class TranscriptionSerializer(serializers.ModelSerializer):
         model = Transcription
         fields = "__all__"
 
+
 class AudioUploadSerializer(serializers.Serializer):
-    audio = serializers.FileField()
+    audio_files = serializers.FileField()

@@ -1,3 +1,5 @@
 env/.env
 env/gcp.json
 db.sqlite3
+.idea
+media/temp

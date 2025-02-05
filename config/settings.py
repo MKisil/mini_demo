@@ -14,11 +14,10 @@ from pathlib import Path
 
 from dotenv import load_dotenv, find_dotenv
 
-load_dotenv(find_dotenv())
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / 'env' / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -30,7 +29,6 @@ SECRET_KEY = 'django-insecure-s6dj7bq0&r5z!5s5q(7f+b%b#-h+&we%@z=(4ii3-1lhmwa8$x
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -76,7 +74,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -86,7 +83,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -106,7 +102,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -118,17 +113,18 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'src/media/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-GOOGLE_CREDENTIALS_PATH = "../env/gcp.json"
+GOOGLE_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'env/gcp.json')
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_PROMPT = "../env/prompt.txt"
+GEMINI_PROMPT = os.path.join(BASE_DIR, 'env/prompt.txt')
