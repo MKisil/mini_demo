@@ -1,3 +1,4 @@
+import os
 import uuid
 import wave
 import io
@@ -6,12 +7,14 @@ import re
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from google.cloud import speech
+from google.cloud import storage
 import google.generativeai as genai
 from pydub import AudioSegment
 
 from config import settings
 
 speech_client = speech.SpeechClient.from_service_account_file(settings.GOOGLE_CREDENTIALS_PATH)
+storage_client = storage.Client.from_service_account_json(settings.GOOGLE_CREDENTIALS_PATH)
 
 
 def prepare_text(text, symbols):
@@ -38,20 +41,39 @@ def transcribe_audio(input_file):
 
     with wave.open(converted_audio_filepath, 'rb') as wav_file:
         sample_rate = wav_file.getframerate()
+        frames = wav_file.getnframes()
+        duration = frames / float(sample_rate)
 
-    with open(converted_audio_filepath, "rb") as audio_file:
-        content = audio_file.read()
+    config = speech.RecognitionConfig(
+        {
+            'encoding': speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            'language_code': "uk-UA",
+            'enable_automatic_punctuation': True,
+            'sample_rate_hertz': sample_rate,
+        }
+    )
+
+    if duration < 60:
+        with open(converted_audio_filepath, "rb") as audio_file:
+            content = audio_file.read()
         audio = speech.RecognitionAudio({'content': content})
-        config = speech.RecognitionConfig(
-            {
-                'encoding': speech.RecognitionConfig.AudioEncoding.LINEAR16,
-                'language_code': "uk-UA",
-                'enable_automatic_punctuation': True,
-                'sample_rate_hertz': sample_rate,
-            }
-        )
 
-    response = speech_client.recognize(config=config, audio=audio)
+        response = speech_client.recognize(config=config, audio=audio)
+    else:
+        bucket_name = "mini_demo"
+        bucket = storage_client.bucket(bucket_name)
+
+        blob_name = os.path.basename(converted_audio_filepath)
+        blob = bucket.blob(blob_name)
+        blob.upload_from_filename(converted_audio_filepath)
+
+        gcs_uri = f"gs://{bucket_name}/{blob_name}"
+        audio = speech.RecognitionAudio({'uri': gcs_uri})
+
+        operation = speech_client.long_running_recognize(config=config, audio=audio)
+        print("Waiting for long-running operation to complete...")
+        response = operation.result(timeout=300)
+        blob.delete()
 
     default_storage.delete(converted_audio_filepath)
 

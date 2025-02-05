@@ -13,6 +13,7 @@ python-dotenv = "*"
 pydub = "*"
 ffmpeg = "*"
 ffprobe = "*"
+google-cloud-storage = "*"
 
 [dev-packages]
 
